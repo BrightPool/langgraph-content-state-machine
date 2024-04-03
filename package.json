@@ -1,0 +1,29 @@
+{
+  "name": "editing-pipeline-flow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "watch": "npx tsc -w",
+    "watch:run": "nodemon dist/index.js",
+    "dev": "concurrently \"npm run watch\" \"npm run watch:run\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "@langchain/langgraph": "^0.0.12",
+    "@langchain/openai": "^0.0.25",
+    "dotenv": "^16.4.5",
+    "langchain": "^0.1.30",
+    "npm": "^10.5.1"
+  }
+}
