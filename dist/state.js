@@ -6,6 +6,9 @@ exports.agentState = {
         value: (x, y) => x.concat(y),
         default: () => [],
     },
+    finalContentBrief: {
+        value: null,
+    },
     numberOfIterations: {
         value: null,
     },

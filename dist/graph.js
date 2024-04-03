@@ -52,7 +52,11 @@ const shouldContinueWithBriefReflection = (state) => {
         return "article_brief_reflection";
     }
     else {
-        return "article_generation";
+        // Store the final content brief within the state:
+        state.finalContentBrief = state.messages[state.messages.length - 1]
+            .content;
+        console.log(`Final content brief: ${state.finalContentBrief}`);
+        return langgraph_1.END;
     }
 };
 const createContentWorkflow = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -62,15 +66,10 @@ const createContentWorkflow = () => __awaiter(void 0, void 0, void 0, function* 
     });
     workflow.addNode("article_brief", briefGenerationNode);
     workflow.addNode("article_brief_reflection", articleBriefReflectionNode);
-    workflow.addNode("article_generation", (state) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log("Generating the article here!");
-        return state;
-    }));
     // Conditional nodes for checking:
     workflow.addConditionalEdges("article_brief", shouldContinueWithBriefReflection);
     // Define the edges within the state machine:
     workflow.addEdge("article_brief_reflection", "article_brief");
-    workflow.addEdge("article_generation", langgraph_1.END);
     // Set the entry point of the state machine:
     workflow.setEntryPoint("article_brief");
     // Compile the state machine:

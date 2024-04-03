@@ -47,6 +47,10 @@ const shouldContinueWithBriefReflection = (state: AgentState) => {
   if (state.numberOfIterations < 3) {
     return "article_brief_reflection";
   } else {
+    // Store the final content brief within the state:
+    state.finalContentBrief = state.messages[state.messages.length - 1]
+      .content as string;
+    console.log(`Final content brief: ${state.finalContentBrief}`);
     return END;
   }
 };

@@ -3,14 +3,19 @@ import {
   ChatPromptTemplate,
   MessagesPlaceholder,
 } from "@langchain/core/prompts";
+import { HumanMessage } from "@langchain/core/messages";
 
 const briefGeneration = ChatPromptTemplate.fromMessages([
   [
     "system",
     `You are an SEO marketing professional. You are responsible for creating an amazing SEO blog post. Generate a really good hierarchical structure for the blog post. Make sure that the brief is clear and concise.
-    The blog post should be on {topic}. Use any of the feedback above in the chat history to further improve the next brief.`,
+    The blog post should be on {topic}. Use any of the feedback above in the chat history to further improve the next brief.
+    `,
   ],
   new MessagesPlaceholder("messages"),
+  new HumanMessage(
+    "I want you to improve the brief, please use any of the feedback from above in our current chat history. You must output a full, improved content brief. Don't reply with certainly or anything. Just give me the updated brief."
+  ),
 ]);
 
 const seoBriefReflectionPrompt = ChatPromptTemplate.fromMessages([

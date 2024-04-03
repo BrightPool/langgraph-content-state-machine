@@ -16,6 +16,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield runnable.invoke({
         numberOfIterations: 0,
         topic: "Data engineering",
+        finalContentBrief: "",
     });
     console.log(`This is the final result`, result);
 });

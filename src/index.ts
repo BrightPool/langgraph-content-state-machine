@@ -6,6 +6,7 @@ const main = async () => {
   const result = await runnable.invoke({
     numberOfIterations: 0,
     topic: "Data engineering",
+    finalContentBrief: "",
   });
   console.log(`This is the final result`, result);
 };

@@ -3,5 +3,6 @@ import { BaseMessage } from "@langchain/core/messages";
 export interface AgentState {
   messages: BaseMessage[];
   numberOfIterations: number;
-  topic: string | null;
+  topic: string;
+  finalContentBrief: string;
 }
