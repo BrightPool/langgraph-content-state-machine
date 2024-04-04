@@ -23,6 +23,7 @@ exports.briefGenerationModel = new openai_1.ChatOpenAI({
     temperature: 0.5,
     streaming: true,
     modelName: "gpt-3.5-turbo",
+    maxTokens: 4000,
 }).withConfig(briefGenerationConfig);
 exports.blogPostGenerationModel = new openai_1.ChatOpenAI({
     temperature: 0.5,

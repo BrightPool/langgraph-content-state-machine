@@ -25,6 +25,7 @@ export const briefGenerationModel = new ChatOpenAI({
   temperature: 0.5,
   streaming: true,
   modelName: "gpt-3.5-turbo",
+  maxTokens: 4000,
 }).withConfig(briefGenerationConfig);
 
 export const blogPostGenerationModel = new ChatOpenAI({
