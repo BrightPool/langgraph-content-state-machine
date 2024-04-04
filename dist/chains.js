@@ -31,7 +31,8 @@ const blogPostPrompt = prompts_1.ChatPromptTemplate.fromMessages([
     
     **Topic:** {topic}
     
-    Generate the best blog post possible based on the user's request. If the user provides critique, respond with a revised version of your previous attempts. Your output should be in markdown format as it will be rendered directly within a NextJS application.`,
+    Generate the best blog post possible based on the user's request. If the user provides critique, respond with a revised version of your previous attempts. Your output should be in markdown format as it will be rendered directly within a NextJS application.
+    You must never include any of the feedback as a separate section. Only respond with the updated, very long and extensive blog post.`,
     ],
     new prompts_1.MessagesPlaceholder("messages"),
 ]);
