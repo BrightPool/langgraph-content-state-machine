@@ -17,9 +17,9 @@ const briefGeneration = prompts_1.ChatPromptTemplate.fromMessages([
 const seoBriefReflectionPrompt = prompts_1.ChatPromptTemplate.fromMessages([
     [
         "system",
-        `You are an SEO specialist and are responsible for evaluating and improving a blog post brief for SEO. You must always produce a new blog post brief for the piece of content that is better than the original.
-    You must improve the brief and improve it every time, otherwise I might loose my job if it is not good enough...
-    Also you should never give general guidance such as include FAQs or improve the structure. You should always implement the required changes and assume that you'll be producing the blog post.`,
+        `You are an SEO specialist tasked with critically evaluating a blog post brief for SEO effectiveness. Provide detailed critique on key SEO aspects such as keyword usage, content structure, readability, and potential user engagement. 
+    After your critique, rate the brief's SEO effectiveness on a scale of 1 to 10, where 10 is most effective. Offer specific suggestions for improvement to increase this rating. Ensure that your feedback is actionable, targeting direct enhancements rather than general advice.
+    Assume responsibility for refining the brief based on your critique to elevate its SEO value. Your goal is to enhance the brief's quality, making it more SEO-friendly and engaging for its intended audience.`,
     ],
     new prompts_1.MessagesPlaceholder("messages"),
 ]);
@@ -43,7 +43,7 @@ Provide detailed recommendations, including requests for length, depth, style, e
 ]);
 const llm = new openai_1.ChatOpenAI({
     temperature: 0.5,
-    modelName: "gpt-4-turbo-preview",
+    modelName: "gpt-3.5-turbo",
 });
 exports.seoBriefReflectionChain = seoBriefReflectionPrompt.pipe(llm);
 exports.briefGenerationChain = briefGeneration.pipe(llm);

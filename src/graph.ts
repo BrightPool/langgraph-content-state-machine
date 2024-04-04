@@ -7,39 +7,38 @@ import { AgentState } from "./types";
 import { briefGenerationChain, seoBriefReflectionChain } from "./chains";
 
 const briefGenerationNode = async (state: AgentState) => {
-  const messages = state.messages;
+  const contextMessages = [];
+  if (state.latestBrief) {
+    contextMessages.push(
+      new HumanMessage(`Latest Brief: ${state.latestBrief}`)
+    );
+  }
+  if (state.latestFeedback) {
+    contextMessages.push(new HumanMessage(`Feedback: ${state.latestFeedback}`));
+  }
+
   const briefGenerated = await briefGenerationChain.invoke({
-    messages,
+    messages: contextMessages,
     topic: state.topic,
   });
+
+  state.latestBrief = briefGenerated.content as string;
+
   return {
-    messages: [...messages, ...[briefGenerated]],
-    numberOfIterations: state.numberOfIterations,
+    ...state,
+    numberOfIterations: state.numberOfIterations + 1,
   };
 };
 
 const articleBriefReflectionNode = async (state: AgentState) => {
-  const clsMap: { [key: string]: new (content: string) => BaseMessage } = {
-    ai: HumanMessage,
-    human: AIMessage,
-  };
-
-  // First message is the original user request. We hold it the same for all nodes
-  const translated = [
-    state.messages[0],
-    ...state.messages
-      .slice(1)
-      .map((msg) => new clsMap[msg._getType()](msg.content as string)),
-  ];
-
-  const res = await seoBriefReflectionChain.invoke({
-    messages: translated,
+  const feedbackResult = await seoBriefReflectionChain.invoke({
+    messages: [new HumanMessage(state.latestBrief)],
   });
-  state.numberOfIterations += 1;
+
+  state.latestFeedback = feedbackResult.content as string;
 
   return {
-    messages: [...state.messages, ...[new HumanMessage(res)]],
-    numberOfIterations: state.numberOfIterations,
+    ...state,
   };
 };
 
@@ -48,9 +47,7 @@ const shouldContinueWithBriefReflection = (state: AgentState) => {
     return "article_brief_reflection";
   } else {
     // Store the final content brief within the state:
-    state.finalContentBrief = state.messages[state.messages.length - 1]
-      .content as string;
-    console.log(`Final content brief: ${state.finalContentBrief}`);
+    state.finalContentBrief = state.latestBrief;
     return END;
   }
 };

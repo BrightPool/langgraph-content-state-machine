@@ -15,4 +15,10 @@ exports.agentState = {
     topic: {
         value: null,
     },
+    latestFeedback: {
+        value: null, // Stores the latest feedback to refine the brief
+    },
+    latestBrief: {
+        value: null, // Stores the latest version of the content brief
+    },
 };

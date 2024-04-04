@@ -5,4 +5,6 @@ export interface AgentState {
   numberOfIterations: number;
   topic: string;
   finalContentBrief: string;
+  latestFeedback: string;
+  latestBrief: string;
 }

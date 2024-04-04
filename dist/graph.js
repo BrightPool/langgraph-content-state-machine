@@ -16,36 +16,26 @@ const messages_1 = require("@langchain/core/messages");
 const state_1 = require("./state");
 const chains_1 = require("./chains");
 const briefGenerationNode = (state) => __awaiter(void 0, void 0, void 0, function* () {
-    const messages = state.messages;
+    const contextMessages = [];
+    if (state.latestBrief) {
+        contextMessages.push(new messages_1.HumanMessage(`Latest Brief: ${state.latestBrief}`));
+    }
+    if (state.latestFeedback) {
+        contextMessages.push(new messages_1.HumanMessage(`Feedback: ${state.latestFeedback}`));
+    }
     const briefGenerated = yield chains_1.briefGenerationChain.invoke({
-        messages,
+        messages: contextMessages,
         topic: state.topic,
     });
-    return {
-        messages: [...messages, ...[briefGenerated]],
-        numberOfIterations: state.numberOfIterations,
-    };
+    state.latestBrief = briefGenerated.content;
+    return Object.assign(Object.assign({}, state), { numberOfIterations: state.numberOfIterations + 1 });
 });
 const articleBriefReflectionNode = (state) => __awaiter(void 0, void 0, void 0, function* () {
-    const clsMap = {
-        ai: messages_1.HumanMessage,
-        human: messages_1.AIMessage,
-    };
-    // First message is the original user request. We hold it the same for all nodes
-    const translated = [
-        state.messages[0],
-        ...state.messages
-            .slice(1)
-            .map((msg) => new clsMap[msg._getType()](msg.content)),
-    ];
-    const res = yield chains_1.seoBriefReflectionChain.invoke({
-        messages: translated,
+    const feedbackResult = yield chains_1.seoBriefReflectionChain.invoke({
+        messages: [new messages_1.HumanMessage(state.latestBrief)],
     });
-    state.numberOfIterations += 1;
-    return {
-        messages: [...state.messages, ...[new messages_1.HumanMessage(res)]],
-        numberOfIterations: state.numberOfIterations,
-    };
+    state.latestFeedback = feedbackResult.content;
+    return Object.assign({}, state);
 });
 const shouldContinueWithBriefReflection = (state) => {
     if (state.numberOfIterations < 3) {
@@ -53,9 +43,7 @@ const shouldContinueWithBriefReflection = (state) => {
     }
     else {
         // Store the final content brief within the state:
-        state.finalContentBrief = state.messages[state.messages.length - 1]
-            .content;
-        console.log(`Final content brief: ${state.finalContentBrief}`);
+        state.finalContentBrief = state.latestBrief;
         return langgraph_1.END;
     }
 };
