@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const graph_1 = require("./graph");
 require("dotenv/config");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    const runnable = yield (0, graph_1.createContentWorkflow)();
+    const runnable = yield (0, graph_1.createGraph)();
     const result = yield runnable.invoke({
         numberOfIterations: 0,
         topic: "Data engineering",

@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createContentWorkflow = void 0;
+exports.createGraph = void 0;
 const langgraph_1 = require("@langchain/langgraph");
 const messages_1 = require("@langchain/core/messages");
 // Custom state machine and agent chains:
 const state_1 = require("./state");
+const types_1 = require("./types");
 const chains_1 = require("./chains");
 const briefGenerationNode = (state) => __awaiter(void 0, void 0, void 0, function* () {
     const contextMessages = [];
@@ -37,23 +38,38 @@ const articleBriefReflectionNode = (state) => __awaiter(void 0, void 0, void 0, 
     state.latestFeedback = feedbackResult.content;
     return Object.assign({}, state);
 });
+const blogPostGenerationNode = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    const contextMessages = [];
+    if (state.finalContentBrief)
+        throw new Error("A final content brief must exist!");
+    contextMessages.push(new messages_1.HumanMessage(`Final Brief: ${state.finalContentBrief}`));
+    const contentGenerated = yield chains_1.blogPostGenerationChain.invoke({
+        messages: contextMessages,
+        topic: state.topic,
+    });
+    state.latestBlogPost = contentGenerated.content;
+    return Object.assign({}, state);
+});
 const shouldContinueWithBriefReflection = (state) => {
     if (state.numberOfIterations < 3) {
         return "article_brief_reflection";
     }
     else {
-        // Store the final content brief within the state:
         state.finalContentBrief = state.latestBrief;
         return langgraph_1.END;
     }
 };
-const createContentWorkflow = () => __awaiter(void 0, void 0, void 0, function* () {
+const createGraph = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (graphType = types_1.GraphType.BriefGeneration) {
     const workflow = new langgraph_1.StateGraph({
         // @ts-ignore
         channels: state_1.agentState,
     });
     workflow.addNode("article_brief", briefGenerationNode);
     workflow.addNode("article_brief_reflection", articleBriefReflectionNode);
+    // Add extra nodes/edges for article generation:
+    if (graphType === types_1.GraphType.ArticleGeneration) {
+        workflow.addNode("generate_blog_post", blogPostGenerationNode);
+    }
     // Conditional nodes for checking:
     workflow.addConditionalEdges("article_brief", shouldContinueWithBriefReflection);
     // Define the edges within the state machine:
@@ -64,4 +80,4 @@ const createContentWorkflow = () => __awaiter(void 0, void 0, void 0, function* 
     const runnable = workflow.compile();
     return runnable;
 });
-exports.createContentWorkflow = createContentWorkflow;
+exports.createGraph = createGraph;

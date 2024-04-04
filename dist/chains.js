@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.essayGenerationChain = exports.reflectChain = exports.briefGenerationChain = exports.seoBriefReflectionChain = void 0;
+exports.blogPostReflectionChain = exports.blogPostGenerationChain = exports.seoBriefReflectionChain = exports.briefGenerationChain = void 0;
 const openai_1 = require("@langchain/openai");
 const prompts_1 = require("@langchain/core/prompts");
 const messages_1 = require("@langchain/core/messages");
@@ -12,7 +12,7 @@ const briefGeneration = prompts_1.ChatPromptTemplate.fromMessages([
     `,
     ],
     new prompts_1.MessagesPlaceholder("messages"),
-    new messages_1.HumanMessage("I want you to improve the brief, please use any of the feedback from above in our current chat history. You must output a full, improved content brief. Don't reply with certainly or anything. Just give me the updated brief."),
+    new messages_1.HumanMessage("I want you to improve the brief, please use any of the feedback from above in our current chat history. You must output a full, improved content brief. Don't reply with certainly or anything. Just give me the updated brief. You must produce the brief within .md format, as this will be rendered within a NextJS application"),
 ]);
 const seoBriefReflectionPrompt = prompts_1.ChatPromptTemplate.fromMessages([
     [
@@ -43,9 +43,10 @@ Provide detailed recommendations, including requests for length, depth, style, e
 ]);
 const llm = new openai_1.ChatOpenAI({
     temperature: 0.5,
+    streaming: false,
     modelName: "gpt-3.5-turbo",
 });
-exports.seoBriefReflectionChain = seoBriefReflectionPrompt.pipe(llm);
 exports.briefGenerationChain = briefGeneration.pipe(llm);
-exports.reflectChain = blogReflectionPrompt.pipe(llm);
-exports.essayGenerationChain = blogPostPrompt.pipe(llm);
+exports.seoBriefReflectionChain = seoBriefReflectionPrompt.pipe(llm);
+exports.blogPostGenerationChain = blogPostPrompt.pipe(llm);
+exports.blogPostReflectionChain = blogReflectionPrompt.pipe(llm);

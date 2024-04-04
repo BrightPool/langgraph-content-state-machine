@@ -15,9 +15,12 @@ export const agentState = {
     value: null,
   },
   latestFeedback: {
-    value: null, // Stores the latest feedback to refine the brief
+    value: null,
   },
   latestBrief: {
-    value: null, // Stores the latest version of the content brief
+    value: null,
+  },
+  latestBlogPost: {
+    value: null,
   },
 };

@@ -4,7 +4,12 @@ import { BaseMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 // Custom state machine and agent chains:
 import { agentState } from "./state";
 import { AgentState } from "./types";
-import { briefGenerationChain, seoBriefReflectionChain } from "./chains";
+import { GraphType } from "./types";
+import {
+  briefGenerationChain,
+  seoBriefReflectionChain,
+  blogPostGenerationChain,
+} from "./chains";
 
 const briefGenerationNode = async (state: AgentState) => {
   const contextMessages = [];
@@ -36,7 +41,25 @@ const articleBriefReflectionNode = async (state: AgentState) => {
   });
 
   state.latestFeedback = feedbackResult.content as string;
+  return {
+    ...state,
+  };
+};
 
+const blogPostGenerationNode = async (state: AgentState) => {
+  const contextMessages = [];
+  if (state.finalContentBrief)
+    throw new Error("A final content brief must exist!");
+  contextMessages.push(
+    new HumanMessage(`Final Brief: ${state.finalContentBrief}`)
+  );
+
+  const contentGenerated = await blogPostGenerationChain.invoke({
+    messages: contextMessages,
+    topic: state.topic,
+  });
+
+  state.latestBlogPost = contentGenerated.content as string;
   return {
     ...state,
   };
@@ -46,13 +69,14 @@ const shouldContinueWithBriefReflection = (state: AgentState) => {
   if (state.numberOfIterations < 3) {
     return "article_brief_reflection";
   } else {
-    // Store the final content brief within the state:
     state.finalContentBrief = state.latestBrief;
     return END;
   }
 };
 
-export const createContentWorkflow = async () => {
+export const createGraph = async (
+  graphType: GraphType = GraphType.BriefGeneration
+) => {
   const workflow = new StateGraph({
     // @ts-ignore
     channels: agentState,
@@ -60,6 +84,12 @@ export const createContentWorkflow = async () => {
 
   workflow.addNode("article_brief", briefGenerationNode);
   workflow.addNode("article_brief_reflection", articleBriefReflectionNode);
+
+  // Add extra nodes/edges for article generation:
+  if (graphType === GraphType.ArticleGeneration) {
+    workflow.addNode("generate_blog_post", blogPostGenerationNode);
+  }
+
   // Conditional nodes for checking:
   workflow.addConditionalEdges(
     "article_brief",

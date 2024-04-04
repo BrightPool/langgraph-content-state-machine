@@ -14,7 +14,7 @@ const briefGeneration = ChatPromptTemplate.fromMessages([
   ],
   new MessagesPlaceholder("messages"),
   new HumanMessage(
-    "I want you to improve the brief, please use any of the feedback from above in our current chat history. You must output a full, improved content brief. Don't reply with certainly or anything. Just give me the updated brief."
+    "I want you to improve the brief, please use any of the feedback from above in our current chat history. You must output a full, improved content brief. Don't reply with certainly or anything. Just give me the updated brief. You must produce the brief within .md format, as this will be rendered within a NextJS application"
   ),
 ]);
 
@@ -50,10 +50,11 @@ Provide detailed recommendations, including requests for length, depth, style, e
 
 const llm = new ChatOpenAI({
   temperature: 0.5,
+  streaming: false,
   modelName: "gpt-3.5-turbo",
 });
 
-export const seoBriefReflectionChain = seoBriefReflectionPrompt.pipe(llm);
 export const briefGenerationChain = briefGeneration.pipe(llm);
-export const reflectChain = blogReflectionPrompt.pipe(llm);
-export const essayGenerationChain = blogPostPrompt.pipe(llm);
+export const seoBriefReflectionChain = seoBriefReflectionPrompt.pipe(llm);
+export const blogPostGenerationChain = blogPostPrompt.pipe(llm);
+export const blogPostReflectionChain = blogReflectionPrompt.pipe(llm);
