@@ -5,6 +5,11 @@ export enum GraphType {
   ArticleGeneration = "articleGeneration",
 }
 
+export enum MetadataState {
+  briefGeneration = "briefGeneration",
+  blogPostGeneration = "blogPostGeneration",
+}
+
 export interface AgentState {
   messages: BaseMessage[];
   numberOfIterations: number;

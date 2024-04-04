@@ -1,9 +1,9 @@
-import { ChatOpenAI } from "@langchain/openai";
 import {
   ChatPromptTemplate,
   MessagesPlaceholder,
 } from "@langchain/core/prompts";
 import { HumanMessage } from "@langchain/core/messages";
+import { model, blogPostGenerationModel, briefGenerationModel } from "./models";
 
 const briefGeneration = ChatPromptTemplate.fromMessages([
   [
@@ -49,13 +49,9 @@ Provide detailed recommendations, including requests for length, depth, style, e
   new MessagesPlaceholder("messages"),
 ]);
 
-const llm = new ChatOpenAI({
-  temperature: 0.5,
-  streaming: false,
-  modelName: "gpt-3.5-turbo",
-});
-
-export const briefGenerationChain = briefGeneration.pipe(llm);
-export const seoBriefReflectionChain = seoBriefReflectionPrompt.pipe(llm);
-export const blogPostGenerationChain = blogPostPrompt.pipe(llm);
-export const blogPostReflectionChain = blogReflectionPrompt.pipe(llm);
+export const briefGenerationChain = briefGeneration.pipe(briefGenerationModel);
+export const seoBriefReflectionChain = seoBriefReflectionPrompt.pipe(model);
+export const blogPostGenerationChain = blogPostPrompt.pipe(
+  blogPostGenerationModel
+);
+export const blogPostReflectionChain = blogReflectionPrompt.pipe(model);

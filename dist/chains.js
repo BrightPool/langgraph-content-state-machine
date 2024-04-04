@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogPostReflectionChain = exports.blogPostGenerationChain = exports.seoBriefReflectionChain = exports.briefGenerationChain = void 0;
-const openai_1 = require("@langchain/openai");
 const prompts_1 = require("@langchain/core/prompts");
 const messages_1 = require("@langchain/core/messages");
+const models_1 = require("./models");
 const briefGeneration = prompts_1.ChatPromptTemplate.fromMessages([
     [
         "system",
@@ -42,12 +42,7 @@ Provide detailed recommendations, including requests for length, depth, style, e
     ],
     new prompts_1.MessagesPlaceholder("messages"),
 ]);
-const llm = new openai_1.ChatOpenAI({
-    temperature: 0.5,
-    streaming: false,
-    modelName: "gpt-3.5-turbo",
-});
-exports.briefGenerationChain = briefGeneration.pipe(llm);
-exports.seoBriefReflectionChain = seoBriefReflectionPrompt.pipe(llm);
-exports.blogPostGenerationChain = blogPostPrompt.pipe(llm);
-exports.blogPostReflectionChain = blogReflectionPrompt.pipe(llm);
+exports.briefGenerationChain = briefGeneration.pipe(models_1.briefGenerationModel);
+exports.seoBriefReflectionChain = seoBriefReflectionPrompt.pipe(models_1.model);
+exports.blogPostGenerationChain = blogPostPrompt.pipe(models_1.blogPostGenerationModel);
+exports.blogPostReflectionChain = blogReflectionPrompt.pipe(models_1.model);
