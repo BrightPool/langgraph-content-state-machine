@@ -9,10 +9,11 @@ const briefGeneration = prompts_1.ChatPromptTemplate.fromMessages([
         "system",
         `You are an SEO marketing professional. You are responsible for creating an amazing SEO blog post. Generate a really good hierarchical structure for the blog post. Make sure that the brief is clear and concise.
     The blog post should be on {topic}. Use any of the feedback above in the chat history to further improve the next brief.
+    Only respond with the raw .md content, never with backticks or any other formatting. The content should be in markdown format as this will be rendered directly within a NextJS application.
     `,
     ],
     new prompts_1.MessagesPlaceholder("messages"),
-    new messages_1.HumanMessage("I want you to improve the brief, please use any of the feedback from above in our current chat history. You must output a full, improved content brief. Don't reply with certainly or anything. Just give me the updated brief. You must produce the brief within .md format, as this will be rendered within a NextJS application"),
+    new messages_1.HumanMessage("I want you to improve the brief, please use any of the feedback from above in our current chat history. You must output a full, improved content brief. Don't reply with certainly or anything. Just give me the updated brief. You must produce the brief within .md format, as this will be rendered within a NextJS application. Never include the target audience or SEO keywords as separate sections."),
 ]);
 const seoBriefReflectionPrompt = prompts_1.ChatPromptTemplate.fromMessages([
     [

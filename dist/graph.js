@@ -50,13 +50,22 @@ const blogPostGenerationNode = (state) => __awaiter(void 0, void 0, void 0, func
     state.latestBlogPost = contentGenerated.content;
     return Object.assign({}, state);
 });
-const shouldContinueWithBriefReflection = (state) => {
+const shouldContinueWithBriefReflectionEndOnBrief = (state) => {
     if (state.numberOfIterations < 3) {
         return "article_brief_reflection";
     }
     else {
         state.finalContentBrief = state.latestBrief;
         return langgraph_1.END;
+    }
+};
+const shouldContinueWithBriefReflectionEndOnBlogPost = (state) => {
+    if (state.numberOfIterations < 3) {
+        return "article_brief_reflection";
+    }
+    else {
+        state.finalContentBrief = state.latestBrief;
+        return "generate_blog_post";
     }
 };
 const createGraph = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (graphType = types_1.GraphType.BriefGeneration) {
@@ -69,9 +78,11 @@ const createGraph = (...args_1) => __awaiter(void 0, [...args_1], void 0, functi
     // Add extra nodes/edges for article generation:
     if (graphType === types_1.GraphType.ArticleGeneration) {
         workflow.addNode("generate_blog_post", blogPostGenerationNode);
+        workflow.addConditionalEdges("article_brief", shouldContinueWithBriefReflectionEndOnBlogPost);
     }
-    // Conditional nodes for checking:
-    workflow.addConditionalEdges("article_brief", shouldContinueWithBriefReflection);
+    else {
+        workflow.addConditionalEdges("article_brief", shouldContinueWithBriefReflectionEndOnBrief);
+    }
     // Define the edges within the state machine:
     workflow.addEdge("article_brief_reflection", "article_brief");
     // Set the entry point of the state machine:

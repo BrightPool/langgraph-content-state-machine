@@ -65,12 +65,21 @@ const blogPostGenerationNode = async (state: AgentState) => {
   };
 };
 
-const shouldContinueWithBriefReflection = (state: AgentState) => {
+const shouldContinueWithBriefReflectionEndOnBrief = (state: AgentState) => {
   if (state.numberOfIterations < 3) {
     return "article_brief_reflection";
   } else {
     state.finalContentBrief = state.latestBrief;
     return END;
+  }
+};
+
+const shouldContinueWithBriefReflectionEndOnBlogPost = (state: AgentState) => {
+  if (state.numberOfIterations < 3) {
+    return "article_brief_reflection";
+  } else {
+    state.finalContentBrief = state.latestBrief;
+    return "generate_blog_post";
   }
 };
 
@@ -88,13 +97,16 @@ export const createGraph = async (
   // Add extra nodes/edges for article generation:
   if (graphType === GraphType.ArticleGeneration) {
     workflow.addNode("generate_blog_post", blogPostGenerationNode);
+    workflow.addConditionalEdges(
+      "article_brief",
+      shouldContinueWithBriefReflectionEndOnBlogPost
+    );
+  } else {
+    workflow.addConditionalEdges(
+      "article_brief",
+      shouldContinueWithBriefReflectionEndOnBrief
+    );
   }
-
-  // Conditional nodes for checking:
-  workflow.addConditionalEdges(
-    "article_brief",
-    shouldContinueWithBriefReflection
-  );
 
   // Define the edges within the state machine:
   workflow.addEdge("article_brief_reflection", "article_brief");
