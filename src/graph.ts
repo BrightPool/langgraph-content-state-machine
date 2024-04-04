@@ -147,9 +147,17 @@ export const createGraph = async (
 
   // Define the edges within the state machine:
   workflow.addEdge("blog_brief_reflection", "blog_brief");
+  workflow.addNode("research", async (state: AgentState) => {
+    // TODO - Add some keyword research within this step:
+    // Doing some research here
+    return {
+      ...state,
+    };
+  });
+  workflow.addEdge("research", "blog_brief");
 
   // Set the entry point of the state machine:
-  workflow.setEntryPoint("blog_brief");
+  workflow.setEntryPoint("research");
 
   // Compile the state machine:
   const runnable = workflow.compile();

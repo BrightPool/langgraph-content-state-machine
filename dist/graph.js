@@ -109,8 +109,14 @@ const createGraph = (...args_1) => __awaiter(void 0, [...args_1], void 0, functi
     }
     // Define the edges within the state machine:
     workflow.addEdge("blog_brief_reflection", "blog_brief");
+    workflow.addNode("research", (state) => __awaiter(void 0, void 0, void 0, function* () {
+        // TODO - Add some keyword research within this step:
+        // Doing some research here
+        return Object.assign({}, state);
+    }));
+    workflow.addEdge("research", "blog_brief");
     // Set the entry point of the state machine:
-    workflow.setEntryPoint("blog_brief");
+    workflow.setEntryPoint("research");
     // Compile the state machine:
     const runnable = workflow.compile();
     return runnable;

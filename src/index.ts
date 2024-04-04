@@ -1,7 +1,6 @@
 import { createGraph } from "./graph";
 import "dotenv/config";
-import { GraphType } from "./types";
-import { AgentState } from "./types";
+import { GraphType, AgentState } from "./types";
 import fs from "fs";
 
 const main = async (
@@ -22,6 +21,7 @@ const main = async (
   )) as AgentState;
 
   if (graphType === GraphType.BlogGeneration) {
+    fs.writeFileSync("data/content_brief.md", result.latestBrief as string);
     fs.writeFileSync("data/blog_post.md", result.latestBlogPost as string);
   } else {
     fs.writeFileSync("data/content_brief.md", result.latestBrief as string);

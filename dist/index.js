@@ -26,10 +26,11 @@ const main = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (to
         recursionLimit: 100,
     }));
     if (graphType === types_1.GraphType.BlogGeneration) {
-        fs_1.default.writeFileSync("blog_post.md", result.latestBlogPost);
+        fs_1.default.writeFileSync("data/content_brief.md", result.latestBrief);
+        fs_1.default.writeFileSync("data/blog_post.md", result.latestBlogPost);
     }
     else {
-        fs_1.default.writeFileSync("content_brief.md", result.latestBrief);
+        fs_1.default.writeFileSync("data/content_brief.md", result.latestBrief);
     }
     // Use the eventStream if you want!
     // const events = [];
