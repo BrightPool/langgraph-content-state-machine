@@ -8,16 +8,22 @@ export const agentState = {
   finalContentBrief: {
     value: null,
   },
-  numberOfIterations: {
+  numberOfBriefIterations: {
+    value: null,
+  },
+  numberOfBlogIterations: {
+    value: null,
+  },
+  latestBrief: {
+    value: null,
+  },
+  latestBriefFeedback: {
     value: null,
   },
   topic: {
     value: null,
   },
-  latestFeedback: {
-    value: null,
-  },
-  latestBrief: {
+  latestBlogPostFeedback: {
     value: null,
   },
   latestBlogPost: {

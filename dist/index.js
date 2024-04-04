@@ -15,23 +15,22 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const graph_1 = require("./graph");
 require("dotenv/config");
-const fs_1 = __importDefault(require("fs"));
-const main = () => __awaiter(void 0, void 0, void 0, function* () {
+const types_1 = require("./types");
+// import fs from "fs";
+const main = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (topic = "Data engineering", graphType = types_1.GraphType.BlogGeneration) {
     var _a, e_1, _b, _c;
-    const graph = yield (0, graph_1.createGraph)();
+    const graph = yield (0, graph_1.createGraph)(graphType);
     const events = [];
     const eventStream = graph.streamEvents({
-        numberOfIterations: 0,
-        topic: "Data engineering",
+        numberOfBriefIterations: 0,
+        topic: topic,
         finalContentBrief: "",
     }, {
         version: "v1",
+        recursionLimit: 100,
     });
     try {
         for (var _d = true, eventStream_1 = __asyncValues(eventStream), eventStream_1_1; eventStream_1_1 = yield eventStream_1.next(), _a = eventStream_1_1.done, !_a; _d = true) {
@@ -49,7 +48,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         finally { if (e_1) throw e_1.error; }
     }
     // Save the events to a file:
-    fs_1.default.writeFileSync("events.json", JSON.stringify(events, null, 2));
+    // fs.writeFileSync("events.json", JSON.stringify(events, null, 2));
     // Print the events to the console:
     console.log(events);
 });

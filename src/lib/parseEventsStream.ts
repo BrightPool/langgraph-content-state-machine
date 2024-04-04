@@ -1,4 +1,5 @@
 import type { StreamEvent } from "@langchain/core/dist/tracers/log_stream";
+import { MetadataState } from "../types";
 
 const resetStateForNewRun = (
   event: StreamEvent,
@@ -6,9 +7,9 @@ const resetStateForNewRun = (
   resetBlogPosts: () => void
 ) => {
   if (event.event === "on_llm_start") {
-    if (event.metadata.step === "briefGeneration") {
+    if (event.metadata.step === MetadataState.briefGeneration) {
       resetBriefs();
-    } else if (event.metadata.step === "blogPostGeneration") {
+    } else if (event.metadata.step === MetadataState.blogPostGeneration) {
       resetBlogPosts();
     }
   }
@@ -31,7 +32,6 @@ export const parserEventsStream = (
           setBriefs((prevBriefs: string) => {
             return prevBriefs + event.data.chunk;
           });
-
           break;
         case "blogPostGeneration":
           setBlogPosts((prevBlogPosts: string) => {

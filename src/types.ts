@@ -2,7 +2,7 @@ import { BaseMessage } from "@langchain/core/messages";
 
 export enum GraphType {
   BriefGeneration = "briefGeneration",
-  ArticleGeneration = "articleGeneration",
+  BlogGeneration = "BlogGeneration",
 }
 
 export enum MetadataState {
@@ -12,10 +12,12 @@ export enum MetadataState {
 
 export interface AgentState {
   messages: BaseMessage[];
-  numberOfIterations: number;
+  numberOfBriefIterations: number;
+  numberOfBlogIterations: number;
   topic: string;
   finalContentBrief: string;
-  latestBlogPost: string | null;
-  latestFeedback: string;
   latestBrief: string;
+  latestBriefFeedback: string;
+  latestBlogPost: string | null;
+  latestBlogPostFeedback: string | null;
 }

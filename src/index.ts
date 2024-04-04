@@ -1,19 +1,24 @@
 import { createGraph } from "./graph";
 import "dotenv/config";
+import { GraphType } from "./types";
 // import fs from "fs";
 
-const main = async (topic: string = "Data engineering") => {
-  const graph = await createGraph();
+const main = async (
+  topic: string = "Data engineering",
+  graphType: GraphType = GraphType.BlogGeneration
+) => {
+  const graph = await createGraph(graphType);
   const events = [];
 
   const eventStream = graph.streamEvents(
     {
-      numberOfIterations: 0,
+      numberOfBriefIterations: 0,
       topic: topic,
       finalContentBrief: "",
     },
     {
       version: "v1",
+      recursionLimit: 100,
     }
   );
 

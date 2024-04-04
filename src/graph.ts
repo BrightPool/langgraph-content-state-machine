@@ -9,6 +9,7 @@ import {
   briefGenerationChain,
   seoBriefReflectionChain,
   blogPostGenerationChain,
+  blogPostReflectionChain,
 } from "./chains";
 
 const briefGenerationNode = async (state: AgentState) => {
@@ -18,8 +19,10 @@ const briefGenerationNode = async (state: AgentState) => {
       new HumanMessage(`Latest Brief: ${state.latestBrief}`)
     );
   }
-  if (state.latestFeedback) {
-    contextMessages.push(new HumanMessage(`Feedback: ${state.latestFeedback}`));
+  if (state.latestBriefFeedback) {
+    contextMessages.push(
+      new HumanMessage(`Feedback: ${state.latestBriefFeedback}`)
+    );
   }
 
   const briefGenerated = await briefGenerationChain.invoke({
@@ -31,16 +34,16 @@ const briefGenerationNode = async (state: AgentState) => {
 
   return {
     ...state,
-    numberOfIterations: state.numberOfIterations + 1,
+    numberOfBriefIterations: state.numberOfBriefIterations + 1,
   };
 };
 
-const articleBriefReflectionNode = async (state: AgentState) => {
+const blogBriefReflectionNode = async (state: AgentState) => {
   const feedbackResult = await seoBriefReflectionChain.invoke({
     messages: [new HumanMessage(state.latestBrief)],
   });
 
-  state.latestFeedback = feedbackResult.content as string;
+  state.latestBriefFeedback = feedbackResult.content as string;
   return {
     ...state,
   };
@@ -48,26 +51,46 @@ const articleBriefReflectionNode = async (state: AgentState) => {
 
 const blogPostGenerationNode = async (state: AgentState) => {
   const contextMessages = [];
-  if (state.finalContentBrief)
-    throw new Error("A final content brief must exist!");
+  if (!state.finalContentBrief) throw new Error("No final content brief found");
   contextMessages.push(
     new HumanMessage(`Final Brief: ${state.finalContentBrief}`)
   );
+
+  if (state.latestBlogPostFeedback) {
+    contextMessages.push(
+      new HumanMessage(
+        `Latest Blog Post Feedback: ${state.latestBlogPostFeedback} Re-write the entire blog post.`
+      )
+    );
+  }
 
   const contentGenerated = await blogPostGenerationChain.invoke({
     messages: contextMessages,
     topic: state.topic,
   });
 
+  state.numberOfBlogIterations = state.numberOfBlogIterations + 1;
   state.latestBlogPost = contentGenerated.content as string;
   return {
     ...state,
   };
 };
 
+const blogPostReflectionNode = async (state: AgentState) => {
+  const feedbackResult = await blogPostReflectionChain.invoke({
+    topic: state.topic,
+    messages: [new HumanMessage(state.latestBlogPost as string)],
+  });
+  state.latestBlogPostFeedback = feedbackResult.content as string;
+  return {
+    ...state,
+  };
+};
+
+// Conditional Nodes:
 const shouldContinueWithBriefReflectionEndOnBrief = (state: AgentState) => {
-  if (state.numberOfIterations < 3) {
-    return "article_brief_reflection";
+  if (state.numberOfBriefIterations < 3) {
+    return "blog_brief_reflection";
   } else {
     state.finalContentBrief = state.latestBrief;
     return END;
@@ -75,11 +98,19 @@ const shouldContinueWithBriefReflectionEndOnBrief = (state: AgentState) => {
 };
 
 const shouldContinueWithBriefReflectionEndOnBlogPost = (state: AgentState) => {
-  if (state.numberOfIterations < 3) {
-    return "article_brief_reflection";
+  if (state.numberOfBriefIterations < 3) {
+    return "blog_brief_reflection";
   } else {
     state.finalContentBrief = state.latestBrief;
     return "generate_blog_post";
+  }
+};
+
+const shouldContinueWithBlogPostReflectionEnd = (state: AgentState) => {
+  if (state.numberOfBlogIterations < 3) {
+    return "blog_post_reflection";
+  } else {
+    return END;
   }
 };
 
@@ -91,28 +122,34 @@ export const createGraph = async (
     channels: agentState,
   });
 
-  workflow.addNode("article_brief", briefGenerationNode);
-  workflow.addNode("article_brief_reflection", articleBriefReflectionNode);
+  workflow.addNode("blog_brief", briefGenerationNode);
+  workflow.addNode("blog_brief_reflection", blogBriefReflectionNode);
 
-  // Add extra nodes/edges for article generation:
-  if (graphType === GraphType.ArticleGeneration) {
+  // Add extra nodes/edges for blog generation:
+  if (graphType === GraphType.BlogGeneration) {
     workflow.addNode("generate_blog_post", blogPostGenerationNode);
+    workflow.addNode("blog_post_reflection", blogPostReflectionNode);
     workflow.addConditionalEdges(
-      "article_brief",
+      "blog_brief",
       shouldContinueWithBriefReflectionEndOnBlogPost
     );
+    workflow.addConditionalEdges(
+      "generate_blog_post",
+      shouldContinueWithBlogPostReflectionEnd
+    );
+    workflow.addEdge("blog_post_reflection", "generate_blog_post");
   } else {
     workflow.addConditionalEdges(
-      "article_brief",
+      "blog_brief",
       shouldContinueWithBriefReflectionEndOnBrief
     );
   }
 
   // Define the edges within the state machine:
-  workflow.addEdge("article_brief_reflection", "article_brief");
+  workflow.addEdge("blog_brief_reflection", "blog_brief");
 
   // Set the entry point of the state machine:
-  workflow.setEntryPoint("article_brief");
+  workflow.setEntryPoint("blog_brief");
 
   // Compile the state machine:
   const runnable = workflow.compile();

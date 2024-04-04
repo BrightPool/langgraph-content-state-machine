@@ -22,9 +22,9 @@ const briefGeneration = ChatPromptTemplate.fromMessages([
 const seoBriefReflectionPrompt = ChatPromptTemplate.fromMessages([
   [
     "system",
-    `You are an SEO specialist tasked with critically evaluating a blog post brief for SEO effectiveness. Provide detailed critique on key SEO aspects such as keyword usage, content structure, readability, and potential user engagement. 
+    `You are an SEO specialist tasked with critically evaluating a blog post for SEO effectiveness. Provide detailed critique on key SEO aspects such as keyword usage, content structure, readability, and potential user engagement. 
     After your critique, rate the brief's SEO effectiveness on a scale of 1 to 10, where 10 is most effective. Offer specific suggestions for improvement to increase this rating. Ensure that your feedback is actionable, targeting direct enhancements rather than general advice.
-    Assume responsibility for refining the brief based on your critique to elevate its SEO value. Your goal is to enhance the brief's quality, making it more SEO-friendly and engaging for its intended audience.`,
+    Assume responsibility for refining the brief based on your critique to elevate its SEO value. Your goal is to enhance the content post's quality, making it more SEO-friendly and engaging for its intended audience.`,
   ],
   new MessagesPlaceholder("messages"),
 ]);
@@ -32,9 +32,11 @@ const seoBriefReflectionPrompt = ChatPromptTemplate.fromMessages([
 const blogPostPrompt = ChatPromptTemplate.fromMessages([
   [
     "system",
-    `You are a marketing genius, responsible for creating an amazing SEO blog post. You are an SEO marketing professional.
-Generate the best essay possible for the user's request. If the user provides critique, respond with a revised version of your previous attempts.
-You must render the output as markdown format as this will be rendered directly within a NextJS application.`,
+    `You are a marketing genius, responsible for creating an amazing, very long and incredibly detailed SEO blog post. As an SEO marketing professional, your goal is to craft content that not only resonates with the target audience but also ranks well on search engines. The post should be engaging, informative, and optimized for keywords relevant to the given topic. Use a clear, accessible language and include actionable insights that provide real value to readers.
+    
+    **Topic:** {topic}
+    
+    Generate the best blog post possible based on the user's request. If the user provides critique, respond with a revised version of your previous attempts. Your output should be in markdown format as it will be rendered directly within a NextJS application.`,
   ],
   new MessagesPlaceholder("messages"),
 ]);
@@ -42,9 +44,9 @@ You must render the output as markdown format as this will be rendered directly 
 const blogReflectionPrompt = ChatPromptTemplate.fromMessages([
   [
     "system",
-    `You are an SEO specialist and are grading a blog post for SEO.
-Generate critique and recommendations for the user's submission.
-Provide detailed recommendations, including requests for length, depth, style, etc.`,
+    `You are an SEO specialist tasked with grading a blog post for its SEO effectiveness. Evaluate the submission based on SEO best practices, including but not limited to keyword optimization, readability, the flow of information, and the strategic use of headings and meta descriptions.
+    **Topic:** {topic}  
+    Generate critique and recommendations for the user's submission. Offer detailed advice on how to improve the post's SEO performance, considering factors like length, depth, style, keyword distribution, and engagement strategies. Provide constructive feedback to help enhance the post's visibility and reader engagement.`,
   ],
   new MessagesPlaceholder("messages"),
 ]);
